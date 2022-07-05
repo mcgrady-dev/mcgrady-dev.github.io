@@ -9,7 +9,7 @@ PATH
       jemoji (~> 0.8)
 
 GEM
-  remote: https://rubygems.org/
+  remote: https://gems.ruby-china.com/
   specs:
     activesupport (6.1.4.3)
       concurrent-ruby (~> 1.0, >= 1.0.2)
@@ -49,6 +49,8 @@ GEM
       rouge (~> 3.0)
       safe_yaml (~> 1.0)
       terminal-table (~> 2.0)
+    jekyll-compose (0.12.0)
+      jekyll (>= 3.7, < 5.0)
     jekyll-feed (0.15.1)
       jekyll (>= 3.7, < 5.0)
     jekyll-paginate (1.1.0)
@@ -73,8 +75,6 @@ GEM
     mercenary (0.4.0)
     minitest (5.15.0)
     nokogiri (1.12.5-arm64-darwin)
-      racc (~> 1.4)
-    nokogiri (1.12.5-x86_64-darwin)
       racc (~> 1.4)
     pathutil (0.16.2)
       forwardable-extended (~> 2.6)
@@ -101,6 +101,7 @@ PLATFORMS
 
 DEPENDENCIES
   bundler
+  jekyll-compose
   jekyll-text-theme!
   rake (~> 10.0)
 
