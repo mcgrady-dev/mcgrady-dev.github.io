@@ -2,8 +2,7 @@
 layout: 
 title: Android Activity
 date: 2022-03-09 11:41 +0800
-tags:
-- android
+tags: android
 ---
 
 **Activity 是 Android 的应用程序组件，用于处理用户操作**。
