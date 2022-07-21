@@ -28,9 +28,7 @@ key: page-about
 
 
 
-MCGRADY
-
-An obscure android developer in GuangZhou, China. 
+Hey there, I’m mcgrady. I’m a Android developer living in GuangZhou, China. I am a fan of basketball, also interested in photography.
 
 The blog for documenting and sharing his programming journey.
 
