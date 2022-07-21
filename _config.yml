@@ -232,6 +232,6 @@ jekyll_compose:
     drafts:
       layout: article
       tags:
-    posts: article
-      layout:
+    posts: 
+      layout: article
       tags:
