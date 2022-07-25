@@ -26,7 +26,7 @@ titles:
 key: page-about
 ---
 
-
+<img src="https://s2.loli.net/2022/07/25/fP83kgOcZwops5J.png" alt="Avator" style="zoom:25%;" />
 
 Hey there, I’m mcgrady. I’m a Android developer living in GuangZhou, China. I am a fan of basketball, also interested in photography.
 
