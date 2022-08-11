@@ -24,11 +24,15 @@ titles:
   fr-LU   : *FR
   # @end locale config
 key: page-about
+article_header:
+  type: cover
+  image:
+    src: https://s2.loli.net/2022/08/10/6H3yAk5EwqjfvUN.png
 ---
 
-<img src="https://s2.loli.net/2022/07/25/fP83kgOcZwops5J.png" alt="Avator" style="zoom:25%;" />
-
 Hey there, I’m mcgrady. I’m a Android developer living in GuangZhou, China. I am a fan of basketball, also interested in photography.
+
+<!--more-->
 
 The blog for documenting and sharing his programming journey.
 
