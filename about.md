@@ -24,9 +24,13 @@ titles:
   fr-LU   : *FR
   # @end locale config
 key: page-about
+mode: immersive
+header:
+  theme: dark
 article_header:
-  type: cover
-  image:
+  type: overlay
+  theme: dark
+  background_image:
     src: https://s2.loli.net/2022/08/10/6H3yAk5EwqjfvUN.png
 ---
 
