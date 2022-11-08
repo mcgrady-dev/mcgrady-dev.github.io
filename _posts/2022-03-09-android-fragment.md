@@ -11,9 +11,9 @@ Fragment 表示应用界面中可重复使用的一部分。Fragment 定义和�
 
 
 
-## 生命周期
+## Lifecycle
 
-![android-fragment-view-lifecycle](https://s2.loli.net/2022/07/19/KROYlEzUQxftZ3u.png)
+<img src="https://s2.loli.net/2022/07/19/KROYlEzUQxftZ3u.png" alt="android-fragment-view-lifecycle" style="zoom:60%;" />
 
 可以看到 Fragment 比 Activity 多了几个额外的回调方法：
 
@@ -128,7 +128,7 @@ Fragment2: [onResume] END
 
 
 
-## Fragment 的优势
+## Fragment的优势
 
 ### 模块化（Modularity）
 
@@ -211,7 +211,7 @@ BackStackRecord 的定义有三重含义：
 
 
 
-## Fragment 通信
+## Fragment通信
 
 ### Interface 方案
 
@@ -219,7 +219,7 @@ Fragmnet 中定义接口，Activity 实现该接口，在 Fragment onAttach 中�
 
 ### FABridge 方案
 
-[FABridge](https://github.com/hongyangAndroid/FABridge) 通过注解的形式免去了接口形式进行数据传递的麻烦
+[FABridge](https://github.com/hongyangAndroid/FABridge)通过注解的形式免去了接口形式进行数据传递的麻烦
 
 ### ViewModel 方案
 
@@ -259,7 +259,7 @@ ViewPager2 本身就支持对实际可见的 Fragment 才调用 onResume 方法�
 
 
 
-## Fragment 使用注意事项
+## Fragment使用注意事项
 
 1. 使用 newInstance 初始化 Fragment
    在横竖屏情况下 Fragment 发生重建时，是通过反射调用无参构造方法进行的，当 Fragment 含有参构造函数时，以上情况并调用有参构造函数，而是会检查`arguments`中是否有参数存在，有则拿出来重用。
@@ -272,7 +272,7 @@ ViewPager2 本身就支持对实际可见的 Fragment 才调用 onResume 方法�
 4. `commit()`
    `coomit()` 操作是异步的，内部有 `checkSateLoss()` 操作；`commit()`操作在`onSaveInstanceState()`之后时，可能会抛出异常，而`commitAllowingStateLoss()`方法则是不会抛出异常版本的`commit()`方法，但是尽量使用`commit()`，而不要使用`commitAllowingStateLoss()`。
 5. `commitNow()`
-   `commitNow()` 操作是同步的，对应异步的 `commit()`。
+   `commitNow()`操作是同步的，对应异步的`commit()`。
 6. Fragment 重叠问题
    由于 Fragment 被系统销毁，重新初始化时再次将 Fragment 加入 Activity 导致，通过外围添加 if 语句判断此时是否为系统销毁并重新初始化的情况。
 7.  Can not perform this action after onSaveInstanceState 异常
@@ -280,7 +280,12 @@ ViewPager2 本身就支持对实际可见的 Fragment 才调用 onResume 方法�
    规避方案：
    - 不要把 Fragment 事务放在异步线程中调用。
    - 逼不得已时使用 `commitAllowingStateLoss()`
-8. 
+
+
+
+## DialogFragment
+
+DialogFragment 在 Android 3.0 时被引入，是一种特殊的 Fragment，用于在 Activity 的内容上显示一个静态的 Dialog。相比 Dialog ，DialogFragment 能更好的管理 Dialog 的 显示与消失，以及在屏幕旋转时的状态保存问题。
 
 
 

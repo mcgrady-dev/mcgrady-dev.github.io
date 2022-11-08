@@ -64,17 +64,19 @@ LinkedList基于链表，不需要提前申请内存大小
 
 无序，不允许重复。
 
-<br>
+ <br>
 
 ### HashSet
 
-HashSet在HashMap的基础上包装了一层，
+HashSet在HashMap的基础上包装了一层。
 
 ### LinkedHashSet
 
+LinkedHashSet是HashSet的子类，同时也是LinkedHashMap的基础上包装了一层。
+
 ### TreeSet
 
-
+一个有序的去重集合容器，TreeSet实际上是TreeMap实现的，
 
 ## Map
 
@@ -128,3 +130,41 @@ LinkedHashMap继承自HashMap，区别在于Linked维护了一个运行于所有
 ![LinkedHashMap](https://s2.loli.net/2022/08/26/jFUzTmaJeAp5Eg8.png)
 
 <br><br>
+
+
+
+## 线程安全的容器
+
+### 同步容器
+
+- **Vector**
+- **Stack**
+- **HashTable**
+- **同步包装器Collections**
+  - Collections.synchronizedList()
+  - Collections.synchronizedMap()
+  - Collections.synchronizedSet()
+
+### 并发容器
+
+- ConcurrentHashMap
+- ConcurrentSkipListMap
+- ConcurrentSkipListSet
+- CopyOnWriteArrayList
+- CopyOnWriteArraySet
+- Queue阻塞型
+  - ArrayListBlockingQueue
+  - LinkedBlockingQueue
+  - PriorityBlockingQueue
+  - DelayQueue
+  - SynchronousQueue
+  - LinkedTransferQueue
+  - LinkedBlockingDeque
+- Queue非阻塞型
+  - ConcurrentLinkedQueue
+
+
+
+参考链接
+
+[同步容器和并发容器总结](https://juejin.cn/post/6844903954719965192)

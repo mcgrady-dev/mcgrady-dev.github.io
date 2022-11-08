@@ -1,6 +1,12 @@
-# Android 注入框架
 
- 
+
+## 依赖注入（Dependency Injection, DI）
+
+依赖注入是一种软件设计模式，能让一个对象接收它所依赖的其他对象，并且接收方不需要知道这些依赖是如何创建的，就能轻松使用。
+
+依赖注入这种设计模式的目的是分离关注点，分离接收方和依赖，从而提供松耦合以及代码重用性。
+
+
 
 ## Hilt
 
@@ -16,7 +22,9 @@
 | ViewWithFragmentComponent | View annotated with @WithFragmentBindings |
 | ServiceComponent          | Service                                   |
 
-> Hilt没有为BoardcastReceiver提供组件，因为Hilt直接从ApplicationComponent中注入了BoardcastReceiver。
+Hilt没有为BoardcastReceiver提供组件，因为Hilt直接从ApplicationComponent中注入了BoardcastReceiver。
+
+
 
 ## Dagger
 

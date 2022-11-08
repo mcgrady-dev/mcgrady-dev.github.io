@@ -1,18 +1,32 @@
-![](../../images/android/android_framework_details.png)
+![android-framework-details](https://s2.loli.net/2022/09/06/Zcjh6HxlJeopFvg.png)
+
+
 
 ## 1. Apps
 
 应用层包含系统内置应用和第三方开发者提供的应用。
 
+### Launcher
 
 
-## 2. Framework
 
-Java API 框架层，这些 API 包含形成创建 Android 应用所需的构建块，可简化核心模块化系统组件和服务的重复使用。
+## 2. Java Framework API
 
-### ActivityManager
+Java API框架层，这些API包含形成创建Android应用所需的构建块，可简化核心模块化系统组件和服务的重复使用。
 
-活动管理器，管理各个应用程序生命周期，以及常用的导航回退功能。
+### SystemServer
+
+
+
+- ActivityManager：活动管理器，管理各个应用程序生命周期，以及常用的导航回退功能。
+- ActivityManagerService：
+- ActivityStackSupervisor：负责监控和管理ActivityStack
+- ActivityStack
+- ActivityTask
+
+
+
+
 
 ### WindowManager
 
@@ -48,13 +62,17 @@ Java API 框架层，这些 API 包含形成创建 Android 应用所需的构建
 
 
 
+
+
+
+
 ## 3.1 Native Libraries
 
-原生 C/C++ 库，许多核心 Android 系统组件和服务（例如 ART 和 HAL）构建自原生代码，需要以 C/C++ 编写的原生库。
+原生C/C++库，许多核心Android系统组件和服务（例如ART和HAL）构建自原生代码，需要以C/C++编写的原生库。
 
 ### SQLite
 
-轻量的关系型数据库引擎
+轻量的关系型数据库引擎。
 
 ### WebKit
 
@@ -78,6 +96,18 @@ Secure Sockets Layer 安全套接字协议，是一种为网络通信提供安�
 
 ## 3.2 Android Runtime
 
+### Android Runtime的演变
+
+| Version     | CHANGELOG                                |
+| ----------- | ---------------------------------------- |
+| Android 1.0 | Dalvik诞生                               |
+| Android 2.2 | JIT首次登场                              |
+| Android 4.4 | ART预览版，全新的AOT编译                 |
+| Android 5.0 | ART全面取代Dalvik，AOT成为唯一的编译模式 |
+| Android 7.0 | JIT回归，形成AOT/JIT混合编译模式         |
+
+
+
 ### ART
 
 Android Runtime (ART) 是 Android 上的应用和部分系统服务使用的**托管式运行时**。
@@ -94,6 +124,8 @@ Android Runtime (ART) 是 Android 上的应用和部分系统服务使用的**�
 - 并发压缩式垃圾回收器
 - 循环优化
 
+
+
 ### Dalvik
 
 Dalvik虚拟机，是 Android 平台的核心组成部分之一。虚拟机可运行Java平台应用程序，这些应用程序被转换成紧凑的Dalvik可执行格式（.dex），该格式适合内存和处理器速度受限的系统。
@@ -105,7 +137,15 @@ Dalvik虚拟机，是 Android 平台的核心组成部分之一。虚拟机可�
 - 虚拟机很小，使用的空间也小；
 - Dalvik没有JIT编译器；
 - 常量池已被修改为只使用32位的索引，以简化解释器；
-- 它使用自己的字节码，而非Java字节码。
+- 它使用自己的字节码，而非Java字节码；
+
+Google在Android 2.2版本添加了JIT编译器，可以对执行次数频繁的代码进行编译缓存和优化，将dex/odex中的Dalvik Code（smali指令集）翻译成更精简的Native Code去执行。
+
+### dx系列工具
+
+dx是一套工具，可以将`.class`转换为`.dex`格式，一个`.dex`通常会有多个`.calss`。dex有时必须进行优化，可以使文件大小增加1~4倍，以`.odex`结尾。
+
+
 
 ### CoreLibraries
 
@@ -122,3 +162,9 @@ Dalvik虚拟机，是 Android 平台的核心组成部分之一。虚拟机可�
 ## 5. Linux Kernel
 
 Android 平台的基础是 Linux 内核，例如，Android Runtime (ART) 依靠 Linux 内核来执行底层功能。并且**系统的安全性、内存管理、进程管理、网络协议和驱动模型等都依赖于 Linux 内核**。
+
+### Drivers
+
+
+
+### PowerManagement

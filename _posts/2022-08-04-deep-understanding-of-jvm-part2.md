@@ -380,11 +380,9 @@ CMS主要的优点有：并发收集和低停顿，但缺点也很明显：
 
 <img src="https://s2.loli.net/2022/07/26/eBKV9Yfqwb8RT3i.png" alt="java-jvm-hotspot-g1" style="zoom:70%;" />
 
-Garbage First简称G1，是一款面向服务端应用的垃圾收集器，开创了**面向局部收集的设计思路和基于Region的内存布局形式**，虽然G1也仍是遵循分代收集理论设计，但其堆内存的布局与其他收集器有非常明显的差异：G1不再坚持固定大小以及固定数量的分代区域划分，而是**把连续的Java堆划分为多个大小相等的独立区域（Region）**，每一个Region都可以根据需要，扮演新生代的**Eden空间**、**Survivor空间**，或者老年代空间。收集器能够对扮演不同角色的Region采用不同的策略去处理，这样无论是新创建的对象还是已经存活了一段时间、熬过多次收集的旧对象都能获取很好的收集效果。
-
-<img src="https://s2.loli.net/2022/08/05/5zfFd8oDyiRNEGs.png" alt="Jvm heap allocation with generational garbage collectors" style="zoom:61%;" />
-
+Garbage First简称G1，开创了**面向局部收集的设计思路和基于Region的内存布局形式**，虽然G1也仍是遵循分代收集理论设计，但其堆内存的布局不再坚持固定大小以及固定数量的分代区域划分，而是**把连续的Java堆划分为多个大小相等的独立区域（Region）**，每个独立的Region通过动态分配方式实现逻辑上的连接，每一个Region都可以根据需要，扮演新生代的**Eden空间**、**Survivor空间**，或者老年代空间。每个Region都是通过指针碰撞来分配空间。
 <img src="https://s2.loli.net/2022/08/05/PEYMgDs2X8x3Nqj.png" alt="JVM heap allocation in G1 GC" style="zoom:80%;" />
+<img src="https://s2.loli.net/2022/08/05/5zfFd8oDyiRNEGs.png" alt="Jvm heap allocation with generational garbage collectors" style="zoom:61%;" />
 
 G1收集器的运作过程大致可划分为以下四个步骤：
 

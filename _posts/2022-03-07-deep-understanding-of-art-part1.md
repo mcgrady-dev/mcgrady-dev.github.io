@@ -11,7 +11,7 @@ tags: [notes,java,jvm,android,art]
 
 <!--more-->
 
-## 1. 深入理解Dex文件格式
+## 深入理解Dex文件格式
 
 **Dex（Dalvik Executable format）是Android平台上传统Class文件对应的Java字节码文件**。Dex文件的核心内容其实与传统Class文件类似，只不过针对移动设备做了一些定制化处理。在一些工具的帮助下，Dex文件和Class文件可以互相转换。
 
@@ -62,7 +62,7 @@ Dex指令码的条数和Class指令码差不多，但Dex文件中存储函数内
 
 
 
-## 2. 深入理解ELF文件格式
+## 深入理解ELF文件格式
 
 ### 概述
 
@@ -164,13 +164,13 @@ typedef struct elf64_phdr {
 
 
 
-## 3. 认识C++11
+## 认识C++11
 
 引言：*当Google用ART虚拟机替代Dalvik的时候，连ART虚拟机的实现代码都切换到了C++11。*
 
 
 
-## 4. 编译dex字节码为机器码
+## 编译dex字节码为机器码
 
 Android在Dalvik时代采用的是JVM中**JIT即时编译**方案，在ART时代开始转而采用了**AOT预编译**方案，AOT方案在安装应用程序时就会尝试将APK中大部分Java函数的字节码转换为机器码，来尽可能提升虚拟机运行速度，但是带来的副作用就是APK安装时间变长了，因为编译生成OAT文件过大等会产生一些列较为影响用户体验的副作用；为此，在Android 7.0中Google对ART进行了改造，综合使用了JIT、AOT编译方案，解决了之前存AOT的弊端。
 
@@ -182,7 +182,7 @@ Android在Dalvik时代采用的是JVM中**JIT即时编译**方案，在ART时代
 
 ![3nd-stage-compiler-structure](https://s2.loli.net/2022/08/10/Tfz9NWqk8n7HvL4.png)
 
-### 4.2 寄存器分配
+### 寄存器分配
 
 经过优化器的IR优化后，下一步就要考虑寄存器的分配（Register Allocation）和指派（Register Assignment）问题了，而寄存器分配属于优化工作的一部分，它往往在优化的最后阶段来执行。
 
@@ -190,7 +190,7 @@ dex指令码操作的是虚拟寄存器，而虚拟寄存器没有个数限制�
 
 
 
-## 5. 虚拟机的创建和启动
+## 虚拟机的创建和启动
 
 在Android中所有Java进程都由Zygote进程`fork`而来，而Zygote进程自己又是Linux系统上的`init进程`，通过解析配置脚本来启动的。
 
@@ -201,11 +201,169 @@ dex指令码操作的是虚拟寄存器，而虚拟寄存器没有个数限制�
 - **JavaVmExt**是JavaVm的派生类，是ART虚拟机JNI层中Java虚拟机的化身；
 - 一些其他的辅助类，比如**MemMap**、**OatFileManger**、**Space家族**、**HeapBitmap**、**GcRoot**等；
 
-### 5.1 初识JNI
+### 初识JNI
 
 **JNI（Java Native Interface）**即Java本地接口，提供了两个关键数据结构**JavaVM**和**JNIEnv**以及一组API，使得Java虚拟机中的Java程序可以调用Native实现的函数。
 
 
 
+## 内存分配与释放
+
+在ART中提供了多种内存分配手段，分别由LargeObjectSpace、BumpPointerSpace、ZygoteSpace、RegionSpace、DIMallocSpace和RosAllocSpace六个类来实现，根据配置情况来使用不同的内存分配类。
+
+<img src="https://s2.loli.net/2022/09/13/BSmoTLHdAWtebxz.png" alt="android-art-space-class" style="zoom:60%;" />
 
 
+
+### Space
+
+Space代表则一块内存空间
+
+### AllocSpace
+
+AllocSpace代表一块可用于内存分配的空间，并提供了内存分配和释放的方法。
+
+### ContinuousSpace
+
+ContinuousSpace表示一块地址连续的内存空间。
+
+### DiscontinuousSpace
+
+DiscontinuousSpace表示一块地址不连续的内存空间。
+
+### MemMapSpace
+
+MemMapSpace继承自ContinuousSpace，表示通过内存映射技术来提供内存空间。
+
+### LargeObjectSpace
+
+LargeObjectSpace继承自DiscontinuousSpace，针对大内存对象的内存分配器，在ART中如果一个String或基础数据的数组类型的对象所需内存超过**3**个内存页时，将使用LargeObjectSpace来提供内存资源。
+
+### ImageSpace
+
+ImageSpace用于`.art`文件的加载 ，每一个art文件都对应一个ImageSpace对象，ImageSpace空间不允许GC。
+
+### ContinuousMemMapAllocSpace
+
+ContinuousMemMapAllocSpace代表一个可对外提供连续内存资源的空间，其内存资源由内存映射技术提供。
+
+### BumpPointerSpace
+
+BumpPointerSpace提供了*“顺序分配”*的内存分配算法，通过指针碰撞移动位置实现。
+
+### RegionSpace
+
+RegionSpace将内存资源划分成固定大小的Region块，Region除了有To Space和From Space两种类型外，还有一种UnEvacFromSpace的类型，它表示某个Region虽然属于From Space的范畴，但它却不需要释放。
+
+### ZygoteSpace
+
+ZygoteSpace继承自AllocSpace，但它实际上不能分配内存。
+
+ZygoteSpace只有在Full GC时才允许回收。
+
+### DIMallocSpace
+
+DIMallocSpace使用开源的dlmalloc来提供具体的内存分配和释放算法。
+
+### RosAllocSpace
+
+RosAllocSpace使用Google的rosalloc内存分配管理器。
+
+
+
+## ART中的GC
+
+### GC的基础概念
+
+- **mutator和collector**：collector表示内存回收相关的功能模块，mutator一般情况下代表应用程序除了collector之外的其他部分。
+- **Incremental Collection**：增量式回收可以每次只针对heap的一部分做GC，从而可大幅减少全量GC带来的停顿时间，而分代GC则是增量式回收的一种实现形式。
+- **Parallel Collection**：**并行回收**指程序中有多个垃圾回收线程，他们可以同时执行回收工作中的某些任务。
+- **Concurrent Collection**：**并发回收**指程序中垃圾回收线程在回收工作的某个阶段可以和其他非回收线程（即mutator）同时运行，这样对程序运行的影响更小。
+
+### ART GC 概览
+
+### MarkSweep
+
+MarkSweep是ART默认的垃圾收集器，依赖Mark-Sweep算法为GC理论。
+
+### ConcurrentCopying
+
+ConcurrentCopying实现了Copying Collection原理，并支持Concurrent回收，ConcurrentCopying以RegionSpace中的Region为单位进行回收。
+
+### MarkCompact
+
+MarkCompact对能搜索到的对象进行位图标记，将存活对象memmove移动到一起，使用的是BumpPoninterSpace空间。
+
+### SemiSpace
+
+SemiSpace在应用程序退到后台后，ART为了减少内存碎片而做的内存压缩时会用到。
+
+
+
+### Java Reference
+
+![java-reference](/Users/mcgrady/Pictures/gallery/java/jvm/java-reference.png)
+
+- SoftReference：不保证每次GC都会回收它们所执行的实际对象；
+- WeakReference：每次GC都会回收它们所指向的实际对象；
+- PhantomReference：和回收没有关系，只是提供一种手段告诉使用者某个实际独享被回收了；
+- FinalizerReference：专用于调用垃圾对象的`finalize`函数，`finalize`函数调用后，垃圾对象会在下一次GC中被回收；
+
+
+
+## Java虚拟机基础
+
+### Java虚拟机概述
+
+#### JVM的数据类型
+
+JVM机制中可以支持以下的基本数据类型：
+
+| 类型          | 字节 | 内容                        |
+| ------------- | ---- | --------------------------- |
+| byte          | 1    | 有符号整数的补码            |
+| short         | 2    | 有符号整数的补码            |
+| int           | 4    | 有符号整数的补码            |
+| long          | 8    | 有符号整数的补码            |
+| float         | 4    | IEEE754单精度浮点数         |
+| double        | 8    | IEEE754双精度浮点数         |
+| char          | 2    | 无符号Unicode字符           |
+| object        | 4    | JavaObject（对象）的引用    |
+| returnAddress | 4    | 用于jsr/ret/jsr-w/ret-w指令 |
+
+虚拟机没有给boolean类型设置单独的指令，boolean型的数据是由integer指令，包括integer返回来处理的，而boolean型的数组则是用byte数组来处理的。
+
+在oracle公司的实现中，对object的引用是一个句柄，其中包含一对指针：一个指向object的方法表，另一个指向object的数据。
+
+#### Java虚拟机体系结构
+
+JVM由几个部分组成：**一组指令集**、**一组寄存器**、**运行时数据区域**、**垃圾收集器**。这几部分是Java虚拟机的逻辑成分，不依赖任何实现技术或组织方式，但它们必须在现实机器上以某种方式实现。
+
+#### Java虚拟机的寄存器
+
+Java虚拟机的寄存器用于保存机器的运行状态，与微处理器中的某些专用寄存器类似，所有寄存器都是32位的。在Java虚拟机中有以下4种寄存器：
+
+- **pc**：程序计数器（Program Counter Register）；
+- **optop**：指向操作数栈顶端的指针；
+- **frame**：指向当前执行方法的执行环境的指针；
+- **vars**：指向当前执行方法的局部变量第一个变量的指针；
+
+Java虚拟机是基于栈式的，它不定义或使用寄存器来传递或接收参数，其目的是为了保证指令集的简洁性和实现时的高效性，特备是对于寄存器数目不多的处理器。
+
+#### 栈
+
+Java虚拟机中的栈有3个区域：局部变量区、运行环境区、操作数区。
+
+### JVM的安全性
+
+
+
+
+
+
+
+## Dalvik和ART基础
+
+大多数虚拟机包括JVM都是一种堆栈机器，而Dalvik虚拟机则是基于寄存器的。栈机（Stack Machine）必须使用指令来载入栈上的数据，或使用指令来操纵数据。所以基于栈的机器需要更多指令，而基于寄存器的机器指令更大。
+
+### Dalvik VM和JVM的差异

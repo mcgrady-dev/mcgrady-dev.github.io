@@ -27,7 +27,7 @@ Activity 提供用户一个交互的接口，Activity 本身没有界面，所�
 
 
 
-## Activity的4种启动模式
+## Activity的5种启动模式
 
 ### standard（默认模式）
 
@@ -51,6 +51,10 @@ Activity 提供用户一个交互的接口，Activity 本身没有界面，所�
 
 与 `"singleTask"` 相似，唯一不同的是系统不会将任何其他 Activity 启动到包含该实例的 Task 中。该 Activity 始终是其 Task 唯一的成员；由该 Activity 启动的任何 Activity 都会在其他的 Task 中打开。
 
+### singleInstancePerTask
+
+
+
 
 
 ## Intent 标记
@@ -64,7 +68,7 @@ Activity 提供用户一个交互的接口，Activity 本身没有界面，所�
 
 
 
-## Activity 被回收的状态和信息保存/恢复过程
+## 状态保存和状态恢复
 
 ```java
 public class MainActivity extends Activity {

@@ -1,3 +1,9 @@
+
+
+<!--more-->
+
+
+
 ## View
 
 ### View 的 3中测量模式
@@ -23,17 +29,19 @@
 
 
 
+## ViewRootImpl
+
+- 作为ViewTree的根，把那个管理ViewTree；
+- 触发View的measure/layout/draw；
+- InputEvent的中转站；
+- 管理Surface；
+- 负责与WindowManagerService进行通信（Binder IPC）；
 
 
 
+## DecorView
 
-
-
-
-
-
-
-
+Window的顶级View
 
 
 

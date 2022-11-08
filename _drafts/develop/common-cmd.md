@@ -16,7 +16,7 @@ chmod +x gradlew
 
 
 
-## Mac OS X
+## macOS
 
 ```bash
 # 复制文件
@@ -30,6 +30,9 @@ rm -r <dir>
 
 # 查看安装位置
 which -a <package>
+
+# 获取可用IP
+nslookup
 ```
 
 

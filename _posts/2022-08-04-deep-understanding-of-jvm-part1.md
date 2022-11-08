@@ -15,11 +15,12 @@ tags: [notes,java,jvm,深入理解Java虚拟机系列]
 
 ![java-language-system](https://s2.loli.net/2022/08/04/agHwI26CSzWeiBJ.png)
 
-- **JDK（Java Development Kit）**：用于支持Java程序开发的最小环境，包含Java程序设计语言、Java虚拟机、Java类库。
-- **JAR（Java ARchiv）**：一种软件包文件格式，以ZIP格式构建，通常用于聚合大量的Java类文件、相关的元数据和资源（文本、图片等）文件到一个文件，以便分发Java平台应用软件或库。
-- **JRE（Java Runtime Environment）**：Java运行环境
-- **JSR（Java Specification Request）**：Java规范请求作为正式规范文档，描述被提议加入到Java体系中的规范和技术。
-- **JCP（Java Community Process）**：一个由业界多家技术巨头组成的社区组织，使用JSR定义和发展Java的技术规范。
+- **JDK（Java Development Kit）**：用于支持Java程序开发的最小环境，包含Java程序设计语言、Java虚拟机、Java类库；
+- **JAR（Java ARchiv）**：一种软件包文件格式，以ZIP格式构建，通常用于聚合大量的Java类文件、相关的元数据和资源（文本、图片等）文件到一个文件，以便分发Java平台应用软件或库；
+- **JRE（Java Runtime Environment）**：Java运行环境；
+- **JSR（Java Specification Request）**：Java规范请求作为正式规范文档，描述被提议加入到Java体系中的规范和技术；
+- **JCP（Java Community Process）**：一个由业界多家技术巨头组成的社区组织，使用JSR定义和发展Java的技术规；
+- **JUC**：是`java.util.concurrent`的简称，Java 5.0加入，目的是为了更好的支持高并发任；
 
 
 
