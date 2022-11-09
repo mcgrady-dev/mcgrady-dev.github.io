@@ -43,6 +43,8 @@
 
 Window的顶级View
 
+DecorView是一个FrameLayout，作为Window的顶级View
+
 
 
 

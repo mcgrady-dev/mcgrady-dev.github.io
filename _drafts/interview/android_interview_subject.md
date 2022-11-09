@@ -125,7 +125,7 @@
 4. **Window的内部机制：添加、删除、更新？**
 
    - addView()：由WindowManager转交到WindowManagerService处理，WMS对窗口申请进行权限和令牌校验，然后为Window创建对应的WindowState和DisplayContent以完成渲染前的准备工作，最终WMS为添加的Window分配Surface，Surface将渲染的可见的图像数据交由SurfaceFlinger合并到屏幕；
-   - updateViewLayout()：由ViewRootImpl通过Choreographer接收VSYNC信号回调下对View进行测量、布局、绘制，同时还通过WindowSession调用WMS重新计算Window焦点；
+   - updateViewLayout()：由ViewRootImpl通过Choreographer接收VSYNC信号回调下对View进行测量、布局、绘制，除了View本身的绘制外，还通过WindowSession调用`WMS.relayoutWindow()`更新Window；
    - removeView()：由ViewRootImpl将View添加到待删除列表中，并分别从ViewRootImpl列表、布局参数列表和View列表中移除View，然后判断是否可以直接执行删除操作，通过同步或异步调用执行View中的`dispatchDetachDetachedFromWindow()`方法，将View从Window中移除，同时处理一些清理工作，最后通过WindowManagerGlobal刷新数据；
 
 5. **Window中的Token是什么？**
@@ -215,7 +215,7 @@
 8. **Choreographer是什么？**
    Choreographer是用于协调动画、输入和绘制的时机，也就是CPU/GPU的绘制是在VSYNC信号到来时开始。
 9. **什么是Surface？**
-   Android一切渲染的内容都由Surface来提供支持，供生产方与消耗方交换缓冲区，Surface可生成一个通常由SurfaceFlinger使用的缓冲区队列。当渲染到Surface上时，结果最终将出现在传送给消费者的缓冲区中。
+   Android中一切渲染的内容都有Surface来提供，Surface为生产方（WindowManager）和消耗放（SurfaceFlinger）提供交换缓冲区（BufferQueue），SurfaceFlinger将多块Surface按照Z-Order次序进行混合并输出到FrameBuffer。
 10. **对SurfaceView的了解？**
     当使用外部缓冲区来源（例如，Camera API或OpenGL ES）进行渲染时，需要从缓冲区来源复制缓冲区以便在屏幕上显示这些缓冲区，为此使用SurfaceView进行渲染时，SurfaceFlinger会直接将缓冲区合成到屏幕上，从而省去了一些额外的工作。
 

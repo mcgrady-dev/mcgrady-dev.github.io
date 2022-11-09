@@ -1,6 +1,6 @@
 ---
 layout: article
-title: Android Binder IPC
+title: Android Window Manager
 date: 2022-03-08 13:44 +0800
 tags: android
 ---
@@ -74,6 +74,37 @@ WindowManagerGlobal作为与WindowManager的底层通信，为WindowManager提�
 
 WIndowManagerService即窗口管理服务，负责Window的启动、添加和删除，另外Window的大小和层级也由WindowManagerService来管理。核心的成员有DisplayContent、WindowToken和WindowState。
 
+下面来了解下WMS的核心组件：
+
+### Session
+
+Seesion主要用于进程间通信，其它应用程序进程想要和WMS交互就需要经过Session。
+
+
+
+### DisplayContent
+
+DisplayContent是Android 4.2为支持多屏幕输出锁引入的一个概念，一个DisplayContent对象用于描述一块屏幕。
+
+### WindowToken
+
+WindowToken窗口令牌主要有两个作用：
+
+- 当应用程序向WMS申请创建一个Window时，则需要向WMS出示有效的WindowToken；
+- 将同一类型组件的WindowState集合在一起管理，比如：Application Window、Sub Window、System Window；
+
+### WindowState
+
+WindowState用于保存窗口的信息，在WMS中WindowState用于描述一个窗口的所有属性。
+
+### WindowAnimator
+
+用于管理窗口的动画
+
+### InputManagerService
+
+输入系统管理服务，用于管理每个窗口的输入事件通道（InputChannel），而WMS仅是作为IMS的中转。
+
 
 
 ### WindowManagerService启动过程
@@ -95,29 +126,6 @@ WIndowManagerService即窗口管理服务，负责Window的启动、添加和删
 
 
 
-### Session
+### Window的布局
 
-Seesion主要用于进程间通信，其它应用程序进程想要和WMS交互就需要经过Session。
-
-### DisplayContent
-
-用于描述一块屏幕
-
-### WindowToken
-
-WindowToken窗口令牌主要有两个作用：
-
-- 当应用程序向WMS申请创建一个Window时，则需要向WMS出示有效的WindowToken；
-- 将同一类型组件的WindowState集合在一起管理，比如：Application Window、Sub Window、System Window；
-
-### WindowSate
-
-WindowState用于保存窗口的信息，在WMS中WindowState用于描述一个窗口。
-
-### WindowAnimator
-
-用于管理窗口的动画
-
-### InputManagerService
-
-输入系统的管理服务，它会寻找一个合适的窗口来处理触摸反馈信息，WMS仅是作为IMS。
+`WMS.relayoutWindow()`方法修改指定窗口的布局参数，然后`WMS.performLayoutAndPlaceSurfacesLocked()`遍历所有窗口并对它们进行重新布局

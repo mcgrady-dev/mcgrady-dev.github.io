@@ -1,6 +1,14 @@
-# Animation
+---
+layout: article
+title: Android Animation
+date: 2022-11-09 14:59 +0800
+tags: android
 
+---
 
+Android提供了平移（Translate）、缩放（Scale）、旋转（Rotate）以及透明度（Alpha）4中类型的动画。
+
+<!--more-->
 
 
 
