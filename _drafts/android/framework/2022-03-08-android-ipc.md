@@ -166,15 +166,15 @@ Binder驱动是一种虚拟的字符设备，注册在`/dev/binder`中，定义�
 
 Client进程通过RPC与Server通信，可以简单地划分为三层，驱动层、IPC层、应用层。
 
-<img src="/Users/mcgrady/Pictures/gallery/android/binder/android-java-binder.png" alt="android-java-binder" style="zoom:85%;" />
+<img src="/Users/mcgrady/Pictures/gallery/android/binder/android-java-binder.png" alt="android-java-binder" style="zoom: 75%;" />
 
 **Binder在进程间通信的流程**
 
-<img src="http://gityuan.com/images/binder/binder_dev/binder_memory_map.jpg" alt="binder_memory_map" style="zoom: 75%;" />
+<img src="http://gityuan.com/images/binder/binder_dev/binder_memory_map.jpg" alt="binder_memory_map" style="zoom: 70%;" />
 
 **Binder通信从ServiceManager到Binder Driver的过程**
 
-<img src="https://s2.loli.net/2022/11/01/l1tMNIzfcO4VGsH.jpg" alt="android-binder-ipc-from-sm-to-driver" style="zoom:75%;" />
+<img src="https://s2.loli.net/2022/11/01/l1tMNIzfcO4VGsH.jpg" alt="android-binder-ipc-from-sm-to-driver" style="zoom:35%;" />
 
 
 
