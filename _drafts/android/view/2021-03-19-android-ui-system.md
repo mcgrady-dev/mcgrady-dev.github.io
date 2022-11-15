@@ -6,7 +6,7 @@
 
 ## View
 
-### View 的 3中测量模式
+### View的3中测量模式
 
 - EXACTLY
   表示设置了精确的值，一般当 childView 设置其宽、高为精确值、match_paren 时，ViewGroup 会将其设置为 EXACTLY
@@ -31,11 +31,69 @@
 
 ## ViewRootImpl
 
+ViewRootImpl实现自ViewParent接口，作为整个控件树的根部，控件的`measure/layout/draw`以及输入事件的派发处理都由ViewRootImpl触发。
+
+### ViewRootImpl的主要成员
+
+```mermaid
+classDiagram
+		direction BT
+    ViewRootImpl <|-- WMS相关
+    ViewRootImpl <|-- 输入事件相关
+    ViewRootImpl <|-- 线程安全相关
+    ViewRootImpl <|-- 控件相关
+    ViewRootImpl <|-- 窗口布局相关
+
+    class ViewRootImpl {
+
+    }
+    class WMS相关 {
+        ~IWindowSession mWindowSession
+        ~IWindow.Stub mWindow
+        ~WindowManager.LayoutParams mWindowAttributes
+        ~Display mDisplay
+    }
+
+    class 输入事件相关 {
+        ~FallbackEventHandler mFallbackEventHandler
+        ~InputChannel mInputChannel
+        ~WindowInputEventReceiver mInputEventReceiver
+    }
+
+    class 控件相关 {
+        ~View mView
+        ~View.AttachInfo mAttachInfo
+        ~Surface mSurface
+    }
+    class 线程安全相关 {
+        ~ViewRootHandler mHandler
+        ~Choreographer mChoreographer
+        ~Thread mThread
+    }
+    class 窗口布局相关 {
+        ~Rect mWinFrame
+        ~Rect mPendingContentInsets
+        ~Rect mPendingVisibleInsets
+        ~int mWidth
+        ~int mHeight
+    }
+```
+
 - 作为ViewTree的根，把那个管理ViewTree；
 - 触发View的measure/layout/draw；
 - InputEvent的中转站；
 - 管理Surface；
 - 负责与WindowManagerService进行通信（Binder IPC）；
+
+### performTraversals()的工作阶段
+
+1. **预测量阶段**：
+2. **布局窗口阶段**：
+3. **最终测量阶段**：
+4. **布局控件树阶段**：
+5. **绘制阶段**：
+
+
 
 
 
