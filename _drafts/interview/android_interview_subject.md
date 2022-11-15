@@ -82,7 +82,7 @@
 
    - `replace`替换其他Fragment时生命周期如下：
      
-     ![fragment-replace-lifecycle](https://s2.loli.net/2022/11/02/xLmgItuVs8qeNWh.png)
+     <img src="https://s2.loli.net/2022/11/02/xLmgItuVs8qeNWh.png" alt="fragment-replace-lifecycle" style="zoom:75%;" />
 
 4. **Fragment的`add`与`replace`的区别？分别对Fragment生命周期的影响？**
    add添加，replace替换，add不会销毁当前Fragment实例，replace会销毁当前Fragment实例。
@@ -224,27 +224,20 @@
 ### View
 
 1. 自定义 View 与 ViewGroup 的区别？
-2. 自定义实现一个九宫格如何实现？
-3. `margin` `padding` 的区别？
-4. `gone` `invisible` 的区别？
-5. `requestLayout` `invalidate` `postInvalidate` 的区别？
-6. DecorView、ViewRootImpl、View之间的关系？`ViewGroup.add()`会多添加一个 `ViewRootImpl` 吗？
-7. 自定义 LinearLayout，怎么测量子 View 宽高？
-8. `requestLayout()`、`onLayout()`、`onDraw()`、`drawChild()`区别于联系？
-9. 一个 wrap_content 的 ImageView，加载远程图片，传什么参数裁剪比较好?
-10. 如何求当前 Activity View 的深度？
-11. Android 支持的单位有？
-13. View的绘制过程？
-    measure、layout、draw
-14. MeasureSpec 的三种模式？
-    - MeasureSpec.EXACTLY：确定模式；
-    - MeasureSpec.AT_MOST：最多模式；
-    - MeasureSpec.UNSPECIFIED；未指定模式；
-14. `onResume`中可以测量宽高么？
-15. View的绘制流程是从Activity哪个生命周期方法开始执行的？
-16. `onCreate`、`onResume`、`onStart`里面，什么地方可以获得宽高？
-17. 为什么 view.post 可以获得宽高，有看过 view.post 的源码吗？
-19. `getWidth()`和`getMeasureWidth()`的区别？
+2. `gone`与`invisible`的区别？
+3. `requestLayout`、`invalidate`、`postInvalidate`的区别？
+4. DecorView、ViewRootImpl、View之间的关系？`ViewGroup.add()`会多添加一个ViewRootImpl吗？
+5. 自定义 LinearLayout，怎么测量子 View 宽高？
+6. `requestLayout()`、`onLayout()`、`onDraw()`、`drawChild()`区别于联系？
+7. 如何求当前Activity View的深度？
+8. View的绘制过程？
+   measure、layout、draw
+9. MeasureSpec的三种模式？
+10. `onResume`中可以测量宽高么？
+11. View的绘制流程是从Activity哪个生命周期方法开始执行的？
+12. `onCreate`、`onResume`、`onStart`里面，什么地方可以获得宽高？
+13. 为什么`view.post`可以获得宽高，有看过`view.post`的源码吗？
+14. `getWidth()`和`getMeasureWidth()`的区别？
 
 
 
