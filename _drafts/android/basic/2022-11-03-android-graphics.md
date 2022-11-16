@@ -145,23 +145,6 @@ flowchart LR
 
 
 
-### DisplayList
-
-```mermaid
-flowchart LR
-    subgraph UT[UI Thread]
-        UTDL(DisplayList)
-    end
-    subgraph RT[Render Thread]
-        RTDL(DisplayList) --> DLOps(DLOps) <-->|Optimizations| RO(Render Ops) -->|Get Buffer| glCommand("GL Command") --> eglSwapBuffer("eglSwapBuffer")
-    end
-	UTDL -->|Sync| RTDL
-```
-
-
-
-
-
 ## High-level components
 
 ### SurfaceView

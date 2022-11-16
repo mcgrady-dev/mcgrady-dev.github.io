@@ -309,7 +309,8 @@
 
 ### Dialog
 
-1. 为什么 Dialog 不能用 Application 的 Context ？
+1. 为什么Dialog不能用Application的Context？
+   由于Dialog的显示需要Window承载，而Application的Context
 
 
 
