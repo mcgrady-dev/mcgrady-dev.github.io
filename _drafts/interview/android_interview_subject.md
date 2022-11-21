@@ -223,21 +223,80 @@
 
 ### View
 
-1. 自定义 View 与 ViewGroup 的区别？
-2. `gone`与`invisible`的区别？
-3. `requestLayout`、`invalidate`、`postInvalidate`的区别？
-4. DecorView、ViewRootImpl、View之间的关系？`ViewGroup.add()`会多添加一个ViewRootImpl吗？
-5. 自定义 LinearLayout，怎么测量子 View 宽高？
-6. `requestLayout()`、`onLayout()`、`onDraw()`、`drawChild()`区别于联系？
-7. 如何求当前Activity View的深度？
-8. View的绘制过程？
-   measure、layout、draw
-9. MeasureSpec的三种模式？
-10. `onResume`中可以测量宽高么？
-11. View的绘制流程是从Activity哪个生命周期方法开始执行的？
-12. `onCreate`、`onResume`、`onStart`里面，什么地方可以获得宽高？
-13. 为什么`view.post`可以获得宽高，有看过`view.post`的源码吗？
-14. `getWidth()`和`getMeasureWidth()`的区别？
+1. **自定义View与ViewGroup的区别？**
+
+   - View是一个组件，ViewGroup是一个View的容器；
+   - ViewGroup比View多出`onInterceptTouchEvent()`方法，用于拦截触摸事件；
+   - ViewGroup需要重写`onMeasure()`方法测量子控件的宽高和自己的宽高，然后实现`onLayout()`方法摆放子控件在父视图中的具体位置；
+
+2. **`gone`与`invisible`的区别？**
+   `invisible`保留控件所占用的空间，`gone`不保留控件占用的空间；
+
+3. **`requestLayout`、`invalidate`、`postInvalidate`的区别？**
+
+   ![android-view-requestlayout-vs-invalidate](/Users/mcgrady/Pictures/gallery/android/view/android-view-requestlayout-vs-invalidate.png)
+
+   - invalidate()：逐级往上调用父View的`invalidateChild()`等相关方法，然后通过调用`scheduleTraversals()`安排绘制任务，等待VSYNC信号到来，在Choreographer的控制下调用`performTraversals()`方法，当满足一定条件时执行measure/layout流程，否则只执行draw流程，draw流程的执行与是否开启硬件加速有关：
+     - 软件绘制：从DecorView开始遍历View树进行重新绘制；
+     - 硬件绘制：只有调用invalidate()方法的View进行重新绘制；
+   - postInvalidate()：`invalidate()`的非UI线程调用版本；
+   - requestLayout()：依次调用`performMeasure()`、`performLayout()`、`performDraw()`方法，调用者View及其父View会从上往下重新进行measure/layout流程，子View通过判断其尺寸/顶点是否发生变化而决定是否重新measure/layout/draw流程；
+   - 使用场景：当需要进行重绘时可以使用`invalidate()`方法，如果是非UI线程则使用`postInvalidate()`方法；当需要重新测量和布局时使用`requestLayout()`，由于`requestLayout()`不一定会重绘，所以如果要进行重绘还需要再调用`invalidate()`方法；
+
+4. **DecorView、ViewRootImpl、View之间的关系？**
+
+   - ViewRootImpl实现自ViewParent，作为连接WindowManager和DecorView的纽带，View的measure/layout/draw流程均是通过ViewRootImpl来完成的；
+   - DecorView继承自FrameLayout，当Activity对象被创建完毕后，会将DecorView添加到Window中，作为整个ViewTree的根部View；
+
+5. **`ViewGroup.add()`会多添加一个ViewRootImpl吗？**
+   不会，`ViewGroup.add()`添加的View会加入到ViewGroup的子View数组中；
+
+6. **自定义LinearLayout，怎么测量子View宽高？**
+   ViewGroup在测量时通过遍历所有子View，调用子View的Measure方法来获取每个子View的测量结果。
+
+7. **`requestLayout()`与`onLayout()`，`onDraw()`与`drawChild()`的区别与联系？**
+
+   - `requestLayout()`会触发ViewRootImpl对View树进行重新布局，`performLayout()`会触发View的`onLayout()`方法；
+   - ViewGroup通过`dispatchDraw()`遍历自己的子View的`draw()`方法，最终触发View的`onDraw()`方法；
+
+8. **如何求当前Activity的View的深度？**
+
+   ```kotlin
+   //递归
+   fun maxdeep(view: View): Int {
+           return when (view) {
+               is ViewGroup -> {
+                   val count = view.childCount
+                   if (count > 0) {
+                       var max = 0
+                       for (i in 0..count) {
+                           val deep = maxdeep(view.getChildAt(i))
+                           if (deep > max) {
+                               max = deep
+                           }
+                       }
+                       return max
+                   }
+                   return 0
+               }
+               else -> 0
+           }
+       }
+   ```
+
+9. **MeasureSpec的三种模式？**
+
+   - UNSPECIFIED：可以是View所期望的任意尺寸，不受限于SPEC_SIZE；
+   - EXACTLY：控件必须为SPEC_SIZE所指定的尺寸，如控件设置了确切值或者MATCH_PARENT；
+   - AT_MOST：可以是View所期望的任意尺寸，受限于SPEC_SIZE，如当控件设置了WRAP_CONTENT；
+
+10. **`onResume()`中可以测量宽高么？**
+    不一定能，首先View的宽高在`onLayout()`阶段才能确定，View的流程是从`ViewRootImpl.performTraversals()`开始，而这个方法调用是在`onResume()`之后，即Activity的`onResume()`阶段并不能保证View的`onLayout()`阶段执行完成，应通过View.post把获取宽高的任务添加到队列尾部，`onLayout()`则优先执行，这样就可以保证在`onLayout()`之后获取View的宽高；
+
+11. 为什么`view.post`可以获得宽高，有看过`view.post`的源码吗？
+    
+
+12. `getWidth()`和`getMeasureWidth()`的区别？
 
 
 

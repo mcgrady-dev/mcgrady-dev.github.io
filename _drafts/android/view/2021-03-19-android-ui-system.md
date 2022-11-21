@@ -82,11 +82,9 @@ classDiagram
 
 **SPEC_MODE**
 
-- **MeasureSepc.UNSPECIFIED (0)**：表示控件在进行测量时，可以五十SPEC_SIZE的值。空间可以是它所期望的任意尺寸；
+- **MeasureSepc.UNSPECIFIED (0)**：表示控件在进行测量时，可以无视SPEC_SIZE的值。空间可以是它所期望的任意尺寸；
 - **MeasureSepc.EXACTLY (1)**：表示子控件必须为SPEC_SIZE所指定的尺寸。当控件的LayoutParams.width/height为确定值，或者是MATCH_PARENT时，对应的MeasureSpec参数会使用这个SPEC_MODE；
 - **MeasureSepc.AT_MOST (2)**：表示子控件可以是它所期望的尺寸，但是不得大于SPEC_SIZE。当控件的LayoutParams.width/height为WRAP_CONTENT时，对应的MeasureSepc参数会使用这个SPEC_MODE；
-
-
 
 
 
