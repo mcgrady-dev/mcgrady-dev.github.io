@@ -261,29 +261,8 @@
 
 8. **如何求当前Activity的View的深度？**
 
-   ```kotlin
-   //递归
-   fun maxdeep(view: View): Int {
-           return when (view) {
-               is ViewGroup -> {
-                   val count = view.childCount
-                   if (count > 0) {
-                       var max = 0
-                       for (i in 0..count) {
-                           val deep = maxdeep(view.getChildAt(i))
-                           if (deep > max) {
-                               max = deep
-                           }
-                       }
-                       return max
-                   }
-                   return 0
-               }
-               else -> 0
-           }
-       }
-   ```
-
+   <script src="https://gist.github.com/mcgrady-dev/aea3dad2bca49a8054525117c9c76250.js"></script>
+   
 9. **MeasureSpec的三种模式？**
 
    - UNSPECIFIED：可以是View所期望的任意尺寸，不受限于SPEC_SIZE；
@@ -291,75 +270,107 @@
    - AT_MOST：可以是View所期望的任意尺寸，受限于SPEC_SIZE，如当控件设置了WRAP_CONTENT；
 
 10. **`onResume()`中可以测量宽高么？**
-    不一定能，首先View的宽高在`onLayout()`阶段才能确定，View的流程是从`ViewRootImpl.performTraversals()`开始，而这个方法调用是在`onResume()`之后，即Activity的`onResume()`阶段并不能保证View的`onLayout()`阶段执行完成，应通过View.post把获取宽高的任务添加到队列尾部，`onLayout()`则优先执行，这样就可以保证在`onLayout()`之后获取View的宽高；
+    不能，首先View的宽高在`onLayout()`阶段才能确定，View的流程是从`ViewRootImpl.performTraversals()`开始，而这个方法调用是在`onResume()`之后，即Activity的`onResume()`阶段并不能保证View的`onLayout()`阶段执行完成，应通过View.post把获取宽高的任务添加到队列尾部，`onLayout()`则优先执行，这样就可以保证在`onLayout()`之后获取View的宽高；
 
-11. 为什么`view.post`可以获得宽高，有看过`view.post`的源码吗？
-    
+11. **为什么`View.post()`可以获得宽高，有看过`View.post()`的源码吗？**
+    `View.post()`分为两种处理逻辑，当View没添加到Window上时，会将Runnable缓存起来，等待View添加到Window上便加入Handler的队列中；否则直接通过AttachInfo的Handler加入队列中；这些Runnable在Handler当前的measure/layout/draw任务执行完后才被执行，所以`View.post()`可以获取View的宽高；
 
-12. `getWidth()`和`getMeasureWidth()`的区别？
+12. **`getWidth()`和`getMeasuredWidth()`的区别？**
 
-
-
-### Drawable
-
-1. Drawable 与 View 有什么区别，Drawable 有哪些子类？
-2. 两个 `getDrawable` 取得的对象，有什么区别？
+    - `getWidth()`的值发生在`onLayout()`过程，计算左右两个顶点获得的结果；
+    - `getMeasuredWidth()`的值发生在`onMeasure()`过程，返回测量后的值；
+    - 一般情况下，它们获取的值是一样的，除非调用了`measure(value, value)`重新赋值；
 
 
 
 ### 事件分发机制
 
-1. 说说事件分发机制？责任链模式的优缺点？
+1. **说说事件分发机制？责任链模式的优缺点？**
 
-2. 事件冲突怎么解决？
-3. `onTouch`和`onTouchEvent`有什么区别，又该如何使用？
-4. `onTouchListener`、`onTouchEvent`、`onClick` 的执行顺序？
-5. ViewGroup在Action_Move时onIntercept返回true，事件怎么传递？
-6. dispatchTouchEvent,onInterceptEvent,onTouchEvent顺序，关系？
-7. setOnTouchListener,onClickeListener和onTouchEvent的关系？
-8. 怎么拦截 `onTouchEvent` ？如果返回 false `onClick` 还会执行吗？
+   - 事件分发机制从DecorView开始传递，首先分派到`Activity.dispatchTouchEvent()`，Activity可以控制是否将事件分派或交由`onTouchEvent()`处理，默认将调用`DecorView.super.dispatchTouchEvent()`将事件从ViewGroup开始向它所有的子View开始分派，在分派前通过`onInterceptTouchEvent()`进行拦截事件，否则将执行子View的`dispatchTouchEvent()`和`onTouchEvent()`方法；
+   - Android输入事件机制中有内层和外层责任链的设计：
+     - 外层责任链：InputStage提供了责任链的模版，实现InputStage的一些列子类各自负责输入事件不同阶段的处理逻辑；
+     - 内层责任链：在View的Touch事件分派中，从DecorView→Activity→ViewGroup→View过程的事件分派，再从View→ViewGroup→Activity→DecorView过程的事件消费结果的反馈，形成一来一回的链条，每个节点都可以对事件进行消费，或者交给上节点或下节点进行处理；
+     - 责任链模式的优点：
+       - 可以控制请求处理的顺序；
+       - 遵循单一职责原则，可对发起操作和执行操作的类进行解耦、职责分明；
+       - 开闭原则，可以不更改现有代码的情况下新增处理者；
+     - 责任链模式的缺点：请求会从连头发出，直到有处理响应，在责任链较长时会影响性能；
+
+2. **`onTouch()`和`onTouchEvent()`有什么区别，又该如何使用？**
+
+   - `onTouchEvent()`是View的成员方法，`onTouch()`是OnTouchEventListener接口的方法；
+   - 当View添加OnTouchEventListener时，`onTouch()`优先于`onTouchEvent()`执行，同时`onTouch()`的事件被消费，返回值为`true`时，`onTouchEvent()`不再执行；
+   - `onTouchEvent()`通过自定义View内部重写实现，`onTouch()`通过在View的外部设置OnTouchEventListener接口重写实现；
+
+3. **`onTouch()`、`onTouchEvent()`、`onClick()`的执行顺序？**
+
+   ```mermaid
+   graph LR
+   	onTouch("onTouch()") --> onTouchEvent("onTouchEvent()") --> onClick("onClick()")
+   ```
+
+4. **`dispatchTouchEvent()`、`onInterceptTouchEvent()`、`onTouchEvent()`的执行顺序和关系？**
+
+   ```mermaid
+   graph LR
+   	dispatchTouchEvent("dispatchTouchEvent()") --> onInterceptTouchEvent("onInterceptTouchEvent()") --> onTouchEvent("onTouchEvent()")
+   ```
+
+5. **`setOnTouchListener()`、`onClickeListener()`和`onTouchEvent()`的关系？**
+   `OnTouchListener.onTouch()`优先于`onTouchEvent()`执行，当事件被消费，返回`true`时，`onTouchEvent()`不再执行，同时`OnClickListener.onClick()`也不再执行，因为OnClickListener是在`onTouchEvent()`中实现的。
+
+6. **怎么拦截`onTouchEvent()`？如果返回`false`，`onClick()`还会执行吗？**
+
+   - 通过父View的`onInterceptTouchEvent()`拦截事件，重写自己的`dispatchTouchEvent()`停止分发事件；
+   - `onTouchEvent()`返回`false`，代表不处理事件将交给父View处理，`onClick()`将不执行，因为`onClick()`的执行逻辑在`super.onTouchEvent()`里；
+
+7. **ViewGroup在`ACTION_MOVE`时`onInterceptTouchEvent()`返回`true`，事件怎么传递？**
+   `onInterceptTouchEvent`()中仅拦截`ACTION_DOWN`事件，所以事件将按照原事件分派逻辑进行分派；
+
+8. 事件冲突怎么解决？
+
+9. 讲一下事件分发机制，RecyclerView是怎么处理内部ViewClick冲突的？
+
+10. 如何解决RecyclerView嵌套RecyclerView条目自动上滚的BUG，如何解决NestScrollView嵌套ScrollView滑动冲突？
+
+11. ScrollView嵌套RecyclerView通常会出现什么问题？
 
 
 
 ### RecyclerView
 
-1. RecyclerView 中 回收是什么？复用是什么？回收到哪里？复用从哪里拿？什么时候回收？什么时候复用？
-
-2. LayoutManager的作用是什么？LayoutManager样式有哪些？`setLayoutManager()` 源码里做了什么？
-
-3. ViewHolder的作用是什么？什么时候停止调用 onCreateViewHolder？
-
-4. 讲一下RecyclerView的缓存机制，滑动10个，再滑回去，会有几个执行onBindView？
-
-5. RecyclerView的缓存结构是怎样的？缓存的是什么？cachedView会执行onBindView吗?
-
-6. RecyclerView的Recycler是如何实现ViewHolder缓存的？如何理解RecyclerView四级缓存是如何实现的？
-
-7. ViewHolder的封装如何对findViewById优化？ViewHolder中为何使用SparseArray代替HashMap存储ViweId？
-8. RecyclerView绘制原理过程大概是怎样的？
-
-9. 如何实现RecyclerView的局部更新，用过payload吗？`notifyItemChanged()`方法中的参数？
-10. 如何解决RecyclerView嵌套RecyclerView条目自动上滚的BUG，如何解决NestScrollView嵌套ScrollView滑动冲突？
-
-11. RecyclerView滑动卡顿原因有哪些？如何解决嵌套布局滑动冲突？如何解决RecyclerView时限画廊卡顿？
-12. RecyclerView常见的优化有哪些？实际开发中都是怎么做的，优化前后对比性能上有何提升？
-13. 如何处理ViewPager嵌套水平RecyclerView横向滑动到底后不滑动ViewPager？如何解决RecyclerView使用Glide加载图片导致图片错乱问题？
-14. 讲一下事件分发机制，RecyclerView是怎么处理内部ViewClick冲突的？
-15. SnapHelper主要是做什么用的？SnapHelper是怎么实现支持RecyclerView的对齐方式？
-16. SpanSizeLookup的作用是什么？SpanSizeLookup如何使用？SpanSizeLookup实现原理如何理解？
-17. 如何实现高复杂的Type需求？如果不封装会出现什么问题和弊端？
-18. 关于item条目点击事件在onCreateViewHolder中写和在onBindViewHolder中写有何区别？如何优化？
-19. RecyclerView 与 ListView 的对比，缓存策略、优缺点？
-20. ViewHolder 为什么要被声明成静态内部类？
-21. ScrollView 嵌套 RecyclerView 通常会出现什么问题？
-22. 如何实现RecyclerView局部刷新？
+1. RecyclerView的缓存机制中回收什么？复用什么？回收到哪里？复用从哪里拿？什么时候回收？什么时候复用？
+   - ViewHolder是回收和复用的对象；
+   - Recycler通过4个层级缓存ViewHolder对象，按优先级从高到低依次为：mAttachedScrap、mCachedViews、mViewCacheExtension、mRecyclerPool；
+   - 当`LayoutManager.onLayoutChildren()`布局子View时，从Recycler中获取复用的ViewHolder；
+   - 当
+2. LayoutManager的作用是什么？LayoutManager样式有哪些？`setLayoutManager()`源码里做了什么？
+   负责RecyclerView的子View的布局
+3. ViewHolder的作用是什么？什么时候停止调用`onCreateViewHolder()`？
+   
+4. **讲一下RecyclerView的缓存机制，滑动10个，再滑回去，会有几个执行`onBindViewHolder()`？**
+   假设屏幕最多能展示10个Item，向下滑动10个Item，由于是未加载过的数据无法从中获取缓存，所以会触发10次调用`onCreateViewHolder()`创建视图和`onBindViewHolder()`绑定数据，当再滑回去时，由于最初加载的10个Item中最后的两个也就是第9和第10个将缓存在mCacheScrap中，mCacheScrap中缓存的ViewHolder不需要重新绑定数据，而第1个到第8个中的后5个则缓存在mRecyclerPool中，这些ViewHolder则需要重新绑定数据，所以会触发5次`onBindViewHolder()` ，其余的3个则无法从缓冲中获取，将触发3次调用`onCreateViewHolder()`创建视图和`onBindViewHolder()`绑定数据，所以总共执行18次`onBindViewHolder()`。
+5. RecyclerView的Recycler是如何实现ViewHolder缓存的？如何理解RecyclerView四级缓存是如何实现的？
+6. ViewHolder的封装如何对`findViewById()`优化？ViewHolder中为何使用SparseArray代替HashMap存储`viewId`？
+7. RecyclerView绘制原理过程大概是怎样的？
+8. 如何实现RecyclerView的局部更新，用过payload吗？`notifyItemChanged()`方法中的参数？
+9. RecyclerView滑动卡顿原因有哪些？如何解决嵌套布局滑动冲突？如何解决RecyclerView时限画廊卡顿？
+10. RecyclerView常见的优化有哪些？实际开发中都是怎么做的，优化前后对比性能上有何提升？
+11. 如何处理ViewPager嵌套水平RecyclerView横向滑动到底后不滑动ViewPager？如何解决RecyclerView使用Glide加载图片导致图片错乱问题？
+12. SnapHelper主要是做什么用的？SnapHelper是怎么实现支持RecyclerView的对齐方式？
+13. SpanSizeLookup的作用是什么？SpanSizeLookup如何使用？SpanSizeLookup实现原理如何理解？
+14. 关于item条目点击事件在`onCreateViewHolder()`中写和在`onBindViewHolder()`中写有何区别？如何优化？
+15. RecyclerView与ListView的对比，缓存策略、优缺点？
+16. ViewHolder为什么要被声明成静态内部类？
+17. 如何实现RecyclerView局部刷新？
 
 
 
 ### ViewPager
 
 1. ViewPager中嵌套ViewPager怎么处理滑动冲突？
-2. 怎么写一个不能滑动的 ViewPager ？
+2. 怎么写一个不能滑动的ViewPager ？
 3. Viewpager切换掉帧有什么处理经验？
 4. ViewPager2原理？
 5. ViewPager切换Fragment什么最耗时？
@@ -368,8 +379,14 @@
 
 ### Dialog
 
-1. 为什么Dialog不能用Application的Context？
-   由于Dialog的显示需要Window承载，而Application的Context
+1. **为什么Dialog不能用Application的Context？**
+   由于Dialog的显示需要Window承载，而Application的Context。
+
+
+
+### Drawable
+
+1. Drawable与View有什么区别，Drawable有哪些子类？
 
 
 
@@ -377,9 +394,9 @@
 
 ### Layout
 
-1. 布局文件中`@`和`?`的区别？
-   - `@` 标记是引用一个实际的值（`color`, `string`, `dimension`...）
-   - `?` 标记是引用一个`style attribute`，其值取决于当前使用的主题
+1. **布局文件中`@`和`?`的区别？**
+   - `@`标记是引用一个实际的值（`color`, `string`, `dimension`...）；
+   - `?`标记是引用一个`style attribute`，其值取决于当前使用的主题；
 2. LayoutInflater 的作用？
 
 ### CoordinatorLayout
@@ -581,17 +598,16 @@
 
 ### Native\H5
 
-1. H5与Native通信你做过什么工作？
-2. H5与Native交互，`webView.loadUrl`与`webView.evaluateUrl`区别？
-3. Native如何对H5进行鉴权，让某些页面可以调，某些页面不能调？
-4. 项目中的Webview与Native通信？
-5. 项目中对WebView的功能进行了怎样的增强？
-6. RN与Flutter的相同点和区别？
-7. webview 如何做资源缓存？
-8. `@JavaScriptInterface` 为什么不通过多个方法来实现？
-9. webview 中与 js 通信的手段有哪些？
-10. 系统上安装了多种浏览器，能否指定某浏览器访问指定页面？请说明原由。
-    通过发送URI把参数带过去，或者通过`manifest`里的`intentfilter`里的`data`属性。
+1. H5与Native交互，`webView.loadUrl`与`webView.evaluateUrl`区别？
+2. Native如何对H5进行鉴权，让某些页面可以调，某些页面不能调？
+3. 项目中的Webview与Native通信？
+4. 项目中对WebView的功能进行了怎样的增强？
+5. RN与Flutter的相同点和区别？
+6. webview如何做资源缓存？
+7. `@JavaScriptInterface` 为什么不通过多个方法来实现？
+8. webview中与js通信的手段有哪些？
+9. 系统上安装了多种浏览器，能否指定某浏览器访问指定页面？请说明原由?
+   通过发送URI把参数带过去，或者通过`manifest`里的`intentfilter`里的`data`属性。
 
 
 

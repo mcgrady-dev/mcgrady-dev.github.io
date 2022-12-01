@@ -104,3 +104,71 @@ InputChannel本质是一对SocketPair（非网络套接字），用于实现在�
 
 - isFocused()：表示狭义的焦点状态，即控件是否拥有PFLAG_FOCUSED标记；
 - hasFocus()：表示广义的焦点状态，焦点是否在其内部，即自身拥有焦点，或者拥有焦点的控件在其所代表的控件树中；
+
+
+
+
+
+## MotionEvent
+
+dispatchTouchEvent
+
+onInterceptTouchEvent
+
+onTouchEvent
+
+
+
+```mermaid
+sequenceDiagram
+    Note right of InputDispatcher: InputChannel
+    InputDispatcher-->>+ViewRootImpl: 
+    ViewRootImpl->>+WindowInputEventReceiver: onInputEvent()
+    ViewInputEventReceiver->>ViewRootImpl: deliverInputEvent()
+    ViewRootImpl-->>+DecorView: dispatchTouchEvent()
+    DecorView->>+Activity: dispatchTouchEvent()
+    Activity->>DecorView: superDispatchTouchEvent()
+    DecorView->>+ViewGroup: super.dispatchTouchEvent()
+    ViewGroup->>ViewGroup: onInterceptTouchEvent()
+    ViewGroup->>+View: dispatchTouchEvent()
+    View->>-ViewGroup: onTouchEvent()
+    ViewGroup->>-Activity: onTouchEvent()
+    Activity->>-DecorView: onTouchEvent()
+    DecorView-->-ViewRootImpl: 
+    WindowInputEventReceiver->>-ViewRootImpl: finishInputEvent()
+    Note right of InputDispatcher: InputChannel
+    ViewRootImpl-->>-InputDispatcher: 
+```
+
+
+
+![android-touch-event-dispatcher](https://s2.loli.net/2022/11/23/klLKqweo5bpUXOH.png)
+
+
+
+## Android输入事件中的责任链模式
+
+### 外层责任链
+
+Android通过InputStage提供责任链的模版，
+
+- **SyntheticInputStage**：综合性的事件处理阶段，处理从未处理的输入事件执行新输入事件的合成，例如轨迹球、操纵杆、导航面板及未捕获的事件使用键盘进行处理；
+- **ViewPostImeInputStage**：视图输入处理阶段，将后期输入事件提供给视图层次结构，例如物理按键、轨迹球、手指触摸；
+- **NativePostImeInputStage**：本地方法处理阶段，将事后输入事件提交到NativeActivity，构建可延迟的重用队列，此时执行操作将异步回调结果；
+- **EarlyPostImeInputStage**：输入法早期处理阶段，执行事后输入事件的早期处理；
+- **ImeInputStage**：输入法事件处理阶段，将预先输入事件提供给视图层次结构，处理一些输入法字符等；
+- **ViewPreImeInputStage**：视图预处理输入法事件阶段，将预先输入事件分派给视图层次结构；
+- **NativePreImeInputStage**：本地方法预处理输入法事件阶段，将预先输入事件提供给NativeActivity，可用于实现类似`adb`输入的功能；
+
+### 内层责任链
+
+在View的Touch事件分派中，从DecorView→Activity→ViewGroup→View过程的事件分派，再从View→ViewGroup→Activity→DecorView过程对事件消费结果的反馈，形成一来一回的链条，每个节点都可以对事件进行消费，或者交给上节点或下节点进行处理。
+
+
+
+## 滑动事件冲突
+
+
+
+
+

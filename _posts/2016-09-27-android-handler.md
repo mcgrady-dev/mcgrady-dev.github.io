@@ -85,6 +85,14 @@ MessageQueue在执行 `next()`方法时，如果发现当前队列是空的或�
 
 
 
+## view.post()
+
+
+
+
+
+
+
 ## Handler中的设计模式
 
 ### 生产者/消费者模式
