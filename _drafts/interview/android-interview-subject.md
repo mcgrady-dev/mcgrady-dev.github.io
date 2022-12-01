@@ -326,7 +326,7 @@
    - `onTouchEvent()`返回`false`，代表不处理事件将交给父View处理，`onClick()`将不执行，因为`onClick()`的执行逻辑在`super.onTouchEvent()`里；
 
 7. **ViewGroup在`ACTION_MOVE`时`onInterceptTouchEvent()`返回`true`，事件怎么传递？**
-   `onInterceptTouchEvent`()中仅拦截`ACTION_DOWN`事件，所以事件将按照原事件分派逻辑进行分派；
+   `onInterceptTouchEvent()`中仅拦截`ACTION_DOWN`事件，所以事件将按照原事件分派逻辑进行分派；
 
 8. 事件冲突怎么解决？
 
@@ -343,10 +343,12 @@
 1. RecyclerView的缓存机制中回收什么？复用什么？回收到哪里？复用从哪里拿？什么时候回收？什么时候复用？
    - ViewHolder是回收和复用的对象；
    - Recycler通过4个层级缓存ViewHolder对象，按优先级从高到低依次为：mAttachedScrap、mCachedViews、mViewCacheExtension、mRecyclerPool；
-   - 当`LayoutManager.onLayoutChildren()`布局子View时，从Recycler中获取复用的ViewHolder；
-   - 当
-2. LayoutManager的作用是什么？LayoutManager样式有哪些？`setLayoutManager()`源码里做了什么？
-   负责RecyclerView的子View的布局
+   - 当触发`LayoutManager.onLayoutChildren()`布局子View时，会从Recycler中获取复用的ViewHolder；
+   - 当触发`LayoutManager.onLayoutChildren()`布局子View时，
+2. **LayoutManager的作用是什么？LayoutManager样式有哪些？`setLayoutManager()`源码里做了什么？**
+   - 负责RecyclerView的子View的布局；
+   - RecyclerView默认提供了LinarLayoutManager、GridLayoutManager、StaggeredGridLayoutManager、FlexboxLayoutManager等布局管理器，同时开发者还可以自定义特定的LayoutManager；
+   - `setLayoutManager()`通过反射获取LayoutManager实例，为RecyclerView设置LayoutManager，其中最主要的触发测量和布局过程；
 3. ViewHolder的作用是什么？什么时候停止调用`onCreateViewHolder()`？
    
 4. **讲一下RecyclerView的缓存机制，滑动10个，再滑回去，会有几个执行`onBindViewHolder()`？**

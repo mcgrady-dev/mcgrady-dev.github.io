@@ -150,8 +150,6 @@ RecyclerView缓存ViewHolder对象有4个级别，从优先级从高到地依次
 - **ViewCacheExtension mViewCacheExtension**：可自定义扩展的缓存策略；
 - **RecyclerViewPool mRecyclerPool**：ViewHolder缓冲池，本质上是SparseArray，其中key是`ViewType`，value是`ArrayList<ViewHolder>`，默认情况下，每个ArrayList最多存储5个ViewHolder；
 
-
-
 ### RecyclerView的四级缓存对比
 
 | 缓存级别 | 成员                            | 操作说明                                        | 是否重新<br>创建视图 | 是否重新<br>绑定数据 |
@@ -162,6 +160,10 @@ RecyclerView缓存ViewHolder对象有4个级别，从优先级从高到地依次
 | 四级缓存 | mRecyclerPool                   | ViewHolder缓冲池<br>默认上限为5                 | 否                   | 是                   |
 
 
+
+## RecyclerView的调用过程
+
+<img src="https://s2.loli.net/2022/12/01/k6MzBoeiO9lcFwb.png" style="zoom: 67%;" />
 
 ### RecyclerView的复用过程
 
