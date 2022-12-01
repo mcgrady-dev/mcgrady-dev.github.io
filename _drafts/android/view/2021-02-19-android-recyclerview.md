@@ -14,7 +14,7 @@ A flexible view for providing a limited window into a large data set.（在有�
 
 ## RecyclerView概览
 
-![recyclerview-structure-2](/Users/mcgrady/Pictures/gallery/android/recyclerview/recyclerview-structure-2.png)
+![recyclerview-structure-2](https://s2.loli.net/2022/12/01/BlmRGwW5LH8FEkN.jpg)
 
 ### Adapter
 
@@ -77,7 +77,7 @@ DiffUtil 可以计算两个列表之间的差异并输出一个更新操作列�
 
 ## RecyclerView的结构设计
 
-![android-recyclerview](/Users/mcgrady/Pictures/gallery/android/recyclerview/android-recyclerview.png)
+![android-recyclerview](https://s2.loli.net/2022/12/01/EpoYbLkAj5xlFy2.png)
 
 - RecyclerView是一个ViewGroup ，它只认识View，不清楚Data的具体结构，而它最终的职责是将Datas以一定的规则展示给用户，因此两个陌生人之间想构建通话，需要通过适配器模式（Adapter）来与建立交流；
 - 通过Adapter将Datas转化为RecyclerView认识的ViewHolder，而ViewHolder包含了ItemView及在RecyclerView中的位置信息，因此RecyclerView间接的认识了Datas；
