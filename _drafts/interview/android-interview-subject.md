@@ -340,32 +340,88 @@
 
 ### RecyclerView
 
-1. RecyclerView的缓存机制中回收什么？复用什么？回收到哪里？复用从哪里拿？什么时候回收？什么时候复用？
+1. **RecyclerView的缓存机制中回收什么？复用什么？回收到哪里？复用从哪里拿？什么时候回收？什么时候复用？**
    - ViewHolder是回收和复用的对象；
    - Recycler通过4个层级缓存ViewHolder对象，按优先级从高到低依次为：mAttachedScrap、mCachedViews、mViewCacheExtension、mRecyclerPool；
-   - 当触发`LayoutManager.onLayoutChildren()`布局子View时，会从Recycler中获取复用的ViewHolder；
-   - 当触发`LayoutManager.onLayoutChildren()`布局子View时，
+   - 当触发`LayoutManager.onLayoutChildren()`布局子View时，会从Recycler中从4个缓存层级中按优先级获取可复用的ViewHolder；
+   - 当触发`LayoutManager.onLayoutChildren()`布局子View时，首先把当前屏幕所有的item与屏幕分离，暂存在Scrap中，然后再重新布局上去，对于没有保存到的Item，将回收到mCachedView或RecyclerPool中；
+
 2. **LayoutManager的作用是什么？LayoutManager样式有哪些？`setLayoutManager()`源码里做了什么？**
+
    - 负责RecyclerView的子View的布局；
    - RecyclerView默认提供了LinarLayoutManager、GridLayoutManager、StaggeredGridLayoutManager、FlexboxLayoutManager等布局管理器，同时开发者还可以自定义特定的LayoutManager；
    - `setLayoutManager()`通过反射获取LayoutManager实例，为RecyclerView设置LayoutManager，其中最主要的触发测量和布局过程；
-3. ViewHolder的作用是什么？什么时候停止调用`onCreateViewHolder()`？
-   
+
+3. **ViewHolder的作用是什么？什么时候停止调用`onCreateViewHolder()`？**
+
+   - ViewHolder持有所有用于绑定数据和操作的View，存储的这些View避免了时间代价很大的`findViewById()`操作；
+   - 还包含了ItemView在RecyclerView中的位置信息，用于回收和复用ViewHolder时匹配RecyclerView上对应的position或itemId；
+   - 当从mCacheViews和RecyclerPool中获取可用的ViewHolder时，停止调用`onCreateViewHolder()`；
+
 4. **讲一下RecyclerView的缓存机制，滑动10个，再滑回去，会有几个执行`onBindViewHolder()`？**
    假设屏幕最多能展示10个Item，向下滑动10个Item，由于是未加载过的数据无法从中获取缓存，所以会触发10次调用`onCreateViewHolder()`创建视图和`onBindViewHolder()`绑定数据，当再滑回去时，由于最初加载的10个Item中最后的两个也就是第9和第10个将缓存在mCacheScrap中，mCacheScrap中缓存的ViewHolder不需要重新绑定数据，而第1个到第8个中的后5个则缓存在mRecyclerPool中，这些ViewHolder则需要重新绑定数据，所以会触发5次`onBindViewHolder()` ，其余的3个则无法从缓冲中获取，将触发3次调用`onCreateViewHolder()`创建视图和`onBindViewHolder()`绑定数据，所以总共执行18次`onBindViewHolder()`。
-5. RecyclerView的Recycler是如何实现ViewHolder缓存的？如何理解RecyclerView四级缓存是如何实现的？
-6. ViewHolder的封装如何对`findViewById()`优化？ViewHolder中为何使用SparseArray代替HashMap存储`viewId`？
+
+5. **RecyclerView的Recycler是如何实现ViewHolder缓存的？如何理解RecyclerView四级缓存是如何实现的？**
+
+   - 通过对离屏的ViewHolder进行分离并从RecyclerView中移除，转存到特定的集合中，当滑动时查找集合中可复用的VeiwHodler，则将其取出重新绑定数据进行复用；
+   - Recycler通过4个层级缓存ViewHolder对象，按优先级从高到低依次为：mAttachedScrap、mCachedViews、mViewCacheExtension、mRecyclerPool，每个集合负责特定场景的ViewHolder的回收和复用；
+
+6. **ViewHolder的封装如何对`findViewById()`优化？ViewHolder中为何使用SparseArray代替HashMap存储`viewId`？**
+
+   SparseArray内部通过两个数组来实现key-value值的存储，查找key用的是二分查找法，相较于HashMap在添加和删除操作时有更好的性能。
+
+   > 考点：`findViewById()`的性能损耗，SparseArray对比HashMap的优劣势。
+
 7. RecyclerView绘制原理过程大概是怎样的？
-8. 如何实现RecyclerView的局部更新，用过payload吗？`notifyItemChanged()`方法中的参数？
-9. RecyclerView滑动卡顿原因有哪些？如何解决嵌套布局滑动冲突？如何解决RecyclerView时限画廊卡顿？
-10. RecyclerView常见的优化有哪些？实际开发中都是怎么做的，优化前后对比性能上有何提升？
-11. 如何处理ViewPager嵌套水平RecyclerView横向滑动到底后不滑动ViewPager？如何解决RecyclerView使用Glide加载图片导致图片错乱问题？
-12. SnapHelper主要是做什么用的？SnapHelper是怎么实现支持RecyclerView的对齐方式？
-13. SpanSizeLookup的作用是什么？SpanSizeLookup如何使用？SpanSizeLookup实现原理如何理解？
-14. 关于item条目点击事件在`onCreateViewHolder()`中写和在`onBindViewHolder()`中写有何区别？如何优化？
+
+8. **RecyclerView滑动卡顿原因有哪些？如何解决嵌套布局滑动冲突？如何解决RecyclerView实现画廊卡顿？**
+
+   - 嵌套布局滑动冲突：当内部控件消费了事件，外部的滑动控件就不应该再相应滑动操作；
+   - 嵌套布局层次太深：层级太深会加大measure/layout/draw的时间，可能会导致卡顿，减少布局层级；
+   - 大图片加载：当RecyclerView滑动时停止图片加载，滑动停止后恢复图片加载；
+   - `onCreateViewViewHolder()`或`onBindViewHolder()`中耗时太长：类似I/O读写，Bitmap解码等一类耗时操作，尽量避免在其中进行；
+
+9. **RecyclerView常见的优化有哪些？实际开发中都是怎么做的，优化前后对比性能上有何提升？**
+
+   - DiffUtil刷新优化：分页拉取远端数据，对拉取下来的远端数据进行缓存，提升二次加载速度；对于新增/删除/移动的数据进行局部刷新，而不是一味的`notfityDataSetChange()`；
+   - 布局优化：减少布局层级，减少xml文件inflate的I/O操作耗时，随着viewType的增多，当Item的复用率降低的情况下，可以考虑通过new View()的方式创建View；
+   - Item条目点击事件优化：在`onCreateViewHolder()`中创建事件监听，而不是`OnBindViewHolder()`中创建，因为会多次创建无用的监听实例；
+   - setHasFixedSize()：当item条目高度固定时，通过`RecyclerView.setHasFixedSize(true)`来避免`requestLayout()`重新布局；
+   - addOnScrollListener()：对滑动过程停止加载操作，滑动停止恢复加载操作；
+
+10. 如何处理ViewPager嵌套水平RecyclerView横向滑动到底后不滑动ViewPager？
+
+    - 外部拦截法：重写`ViewPager.onInterceptTouchEvent()`根据ACTION_DOWN确认子View是否为RecyclerView，再通过ACTION_MOVE的方向判断是否将事件拦截；
+    - 内部拦截法：通过重写`RecyclerView.dispatchTouchEvent()`根据ACTION_MOVE的方向判断调用父View的`requestDisallowInterceptTouchEvent()`请求父View不拦截该事件；
+
+11. **如何解决RecyclerView使用Glide加载图片导致图片错乱问题？**
+    Glide内部通过对View设置标记为解决，Glide将加载请求和Target(ImageView)进行关联，开始某个ImageView的加载请求前会先讲该ImageView关联的请求清除。此时在线程池中关联的DecodeJob，正在进行网络请求不会被中断，而是移除回调并设置取消标记位，让未开始的加载步骤不再执行。当列表快速滑动时，同时执行的网络请求数量不会超过设备可用核心数，其余请求放到等待队列中，等待队列有可能会一下增加到几十，但随着离屏的View被回收，队列中大部分请求都会被取消，即快速滑动国策会给你中很多列表项的请求会被略过。正是这样的机制保证了滑动中不会出现图片错乱的问题。
+
+12. **SnapHelper主要是做什么用的？SnapHelper是怎么实现支持RecyclerView的对齐方式？**
+
+    - SnapHelper是RecyclerView的一个辅助类，用于在RecyclerView滚动结束时将Item对其到某个为止，特别是横向滑动和RecyclerPager中，很多时候不会让列表滑到任意为止，而是有一定的规则限制；
+    - SnapHelper辅助RecyclerView实现滚动对其是通过给RecyclerView设置OnScrollerListener和OnFliingListener监听器实现的；
+
+13. **SpanSizeLookup的作用是什么？SpanSizeLookup如何使用？SpanSizeLookup实现理如何理解？**
+
+    - SpanSizeLookup是GridLayoutManager的辅助类，用于实现item占位多行或多列的方法；
+    - 通过`getSpanSize()`控制每个item的占位；
+
+14. **关于item条目点击事件在`onCreateViewHolder()`中写和在`onBindViewHolder()`中写有何区别？如何优化？**
+    区别在于滑动中，`onBindViewHolder()`回调的次数远远比`onCreateViewHolder()`要多，当布局刷新时命中离屏缓存会从mCacheViews中重新绑定数据进行复用，或者当从RecyclerPool中根据指定的viewType命中缓存时也会重新绑定数据进行服用，而不会执行`onCreateViewHolder()`，所以将item条目的点击事件写在`onCreateViewHolder()`中可以避免多次重复的`setOnClickListener()`，而在`onCreateViewHolder()`中，点击item条目需要获取数据时，缺少了position参数，可以通过adapter获取ViewHolder的bindingAdapterPosition即可。
+
 15. RecyclerView与ListView的对比，缓存策略、优缺点？
-16. ViewHolder为什么要被声明成静态内部类？
-17. 如何实现RecyclerView局部刷新？
+
+16. **ViewHolder为什么要被声明成静态内部类？**
+    由于非静态内部类会隐式持有外部类的引用，将ViewHolder声明成静态内部类可能是考虑内存泄露的问题。
+
+    > 考点：静态内部类和内部类的区别
+
+17. **如何实现RecyclerView的局部更新，用过payload吗？`notifyItemChanged()`方法中的参数？**
+
+    - 通过mAttachedScrap配合mChangedScrap实现，将发生变化的ViewHolder移至mChangedScrap，其余的移至mAttachedScrap，在调用`LayoutManager.onLayoutChildren()`重新布局时，将mAttached取出与RecyclerView上的position或itemId匹配上就直接服用，无需重新绑定数据，只需单独处理mChangedScrap中ViewHodler的`onBindViewHolder()`。
+    - position：代表执行局部刷新的item在RecyclerView中的位置；
+    - payload：代表一个有效的负载对象，可以通知注册了观察者的item进行刷新；
 
 
 

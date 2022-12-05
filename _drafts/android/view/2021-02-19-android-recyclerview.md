@@ -20,6 +20,9 @@ A flexible view for providing a limited window into a large data set.（在有�
 
 获取数据并准备数据供RecyclerView显示
 
+- **onCreateViewHolder()**：
+- onBindViewHolder()
+
 ### ViewHolder
 
 持有所有的用于绑定数据或者需要操作的View
@@ -55,7 +58,14 @@ Item的装饰器
 
 ### DiffUtil
 
-DiffUtil 可以计算两个列表之间的差异并输出一个更新操作列表，将第一个列表转换为第二个列表。
+DiffUtil可以比较两个数据集，寻找旧数据集到新数据集的最小变化量。DiffUtil会自动计算新老数据集的差异，根据差异的情况，自动调用以下四个方法进行刷新：
+
+- notiftyItemRangeInsertted()
+- notifyItemRangeRemoved()
+- notifyItemMoved()
+- notifyItemRangeChanged()
+
+​	
 
 ### RecyclerViewDataObserver
 
@@ -211,4 +221,5 @@ detachAndScrapAttachedViews
 
 [RecyclerView 必知必会](https://juejin.cn/post/6844903459699982343#heading-19)
 [Android ListView 与 RecyclerView 对比浅析 -- 缓存机制](https://juejin.cn/post/6844903448974983181)
+[深入理解Android RecyclerView的缓存机制](https://segmentfault.com/a/1190000040421118)
 
