@@ -6,7 +6,7 @@ tags: android
 
 ---
 
-
+Android输入事件系统
 
 <!--more-->
 
@@ -163,10 +163,6 @@ Android通过InputStage提供责任链的模版，
 ### 内层责任链
 
 在View的Touch事件分派中，从DecorView→Activity→ViewGroup→View过程的事件分派，再从View→ViewGroup→Activity→DecorView过程对事件消费结果的反馈，形成一来一回的链条，每个节点都可以对事件进行消费，或者交给上节点或下节点进行处理。
-
-
-
-## 滑动事件冲突
 
 
 
